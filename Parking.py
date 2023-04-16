@@ -1,7 +1,8 @@
 import csv
 import datetime
+from datetime import datetime
 
-parking_spaces = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3']
+parking_spaces = {}
 
 
 
@@ -76,10 +77,10 @@ def exit_car_park(parking_records, parking_spaces):
     if record is None:
         print(f"No record found for vehicle with registration number {reg_num}")
         return
-    if record['exit_time'] is not None:
+    if record['exit_time'] != '':
         print(f"Vehicle with registration number {reg_num} has already exited the car park")
         return
-    entry_time = record['entry_time']
+    entry_time = datetime.strptime(record['entry_time'], '%m/%d/%Y %I:%M:%S %p')
     exit_time = datetime.now()
     duration = exit_time - entry_time
     hours_parked = duration.total_seconds() / 3600

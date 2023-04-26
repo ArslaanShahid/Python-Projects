@@ -1,6 +1,6 @@
 import csv
+import datetime
 import tkinter as tk
-from datetime import datetime
 from tkinter import messagebox
 
 parking_spaces = {}
@@ -35,26 +35,35 @@ parking_records = read_parking_records_csv('parking_records.csv')
 
 print(parking_records)
 
-def enter_car_park():
-    reg_num = reg_num_entry.get()
+# Define the function to handle entering the car park
+def enter_car_park(parking_records, parking_spaces):
+    # Check if there are any available parking spaces
     if len(parking_spaces) == 0:
         status_label.config(text="Sorry, car park is full.")
     else:
+        # Get the registration number from the entry field
+        reg_num = reg_num_entry.get()
+        
+        # Get the current date and time
+        now = datetime.datetime.now()
+        formatted_time = now.strftime('%m/%d/%Y %I:%M:%S %p')
+        
+        # Assign the first available parking space and ticket number
         space_num = parking_spaces.pop(0)
-        parking_records.append({"registration_number": reg_num, "space_number": space_num})
-        status_label.config(text="Number of available parking spaces: {}".format(len(parking_spaces)))
+        ticket_num = len(parking_records) + 1
+        
+        # Create a new parking record with the registration number, entry time, space number, and ticket number
+        record = {"registration_number": reg_num, "entry_time": formatted_time, "space_number": space_num, "ticket_number": ticket_num}
+        
+        # Add the parking record to the list
+        parking_records.append(record)
+        
+        # Update the status label with the remaining available parking spaces and space number assigned to the vehicle
+        status_label.config(text="Number of available parking spaces: {}\nSpace number assigned to the vehicle: {}".format(len(parking_spaces), space_num))
+        
+        # Clear the entry field
         reg_num_entry.delete(0, tk.END)
-
-def find_record_by_reg_num():
-    reg_num = reg_num_entry.get()
-    for record in parking_records:
-        if record['registration_number'] == reg_num:
-            status_label.config(text="Vehicle with registration number {} is parked in space number {}".format(reg_num, record['space_number']))
-            reg_num_entry.delete(0, tk.END)
-            return
-    status_label.config(text="No record found for vehicle with registration number {}".format(reg_num))
-    reg_num_entry.delete(0, tk.END)
-    
+        reg_num_entry.focus()
 
 def view_available_parking_spaces(parking_records):
     """Counts the number of available parking spaces based on the current parking records.
@@ -81,6 +90,8 @@ def query_parking_record(parking_records):
     status_label.config(text="Ticket number not found.")
 
 
+
+
 root = tk.Tk()
 root.title("Car Park Entry and Find Car by Registration Number")
 
@@ -92,30 +103,78 @@ form_frame.pack(padx=10, pady=10)
 tk.Label(form_frame, text="Registration Number:").pack(side=tk.LEFT)
 reg_num_entry = tk.Entry(form_frame)
 reg_num_entry.pack(side=tk.LEFT)
+
+# Add submit button for entry
+enter_button = tk.Button(form_frame, text="Enter Car Park", command=lambda: enter_car_park(parking_records, parking_spaces))
+enter_button.pack(side=tk.LEFT, padx=5)
+
+# Add form labels and entry fields for finding a parked car
 ticket_num_label = tk.Label(root, text="Enter Ticket Number:")
 ticket_num_label.pack(padx=5, pady=5)
 ticket_num_entry = tk.Entry(root)
 ticket_num_entry.pack(padx=5, pady=5)
-# Add submit buttons for entry and find
-tk.Button(form_frame, text="Enter Car Park", command=enter_car_park).pack(side=tk.LEFT, pady=10)
-tk.Button(form_frame, text="Find Car", command=find_record_by_reg_num).pack(side=tk.LEFT, pady=10)
+
+# Add submit button for finding a parked car
 query_button = tk.Button(root, text="Query", command=lambda: query_parking_record(parking_records))
 query_button.pack(padx=5, pady=5)
-
 
 # Initialize parking records and spaces
 parking_records = read_parking_records_csv('parking_records.csv')
 parking_spaces = list(range(1, 11))
+
 # Add status label
 status_label = tk.Label(root, text="Number of available parking spaces: {}".format(view_available_parking_spaces(parking_records)))
 status_label.pack(padx=5, pady=5)
+
 # Create the label to display the query status
 query_status_label = tk.Label(root, text="")
 query_status_label.pack(padx=5, pady=5)
 
-
 # Start the main loop
 root.mainloop()
+
+
+# root = tk.Tk()
+# root.title("Car Park Entry and Find Car by Registration Number")
+
+# # Create a frame for the entry form
+# form_frame = tk.Frame(root)
+# form_frame.pack(padx=10, pady=10)
+
+# # Add form labels and entry fields
+# tk.Label(form_frame, text="Registration Number:").pack(side=tk.LEFT)
+# reg_num_entry = tk.Entry(form_frame)
+# reg_num_entry.pack(side=tk.LEFT)
+# ticket_num_label = tk.Label(root, text="Enter Ticket Number:")
+# ticket_num_label.pack(padx=5, pady=5)
+# ticket_num_entry = tk.Entry(root)
+# ticket_num_entry.pack(padx=5, pady=5)
+# #add_car
+
+# enter_button = tk.Button(form_frame, text="Enter Car Park", command=enter_car_park)
+# enter_button.pack(side=tk.LEFT, pady=10)
+
+# # Add submit buttons for entry and find
+# tk.Button(form_frame, text="Enter Car Park", command=enter_car_park).pack(side=tk.LEFT, pady=10)
+# query_button = tk.Button(root, text="Query", command=lambda: query_parking_record(parking_records))
+# query_button.pack(padx=5, pady=5)
+
+
+# # Initialize parking records and spaces
+# parking_records = read_parking_records_csv('parking_records.csv')
+# parking_spaces = list(range(1, 11))
+# # Add status label
+# status_label = tk.Label(root, text="Number of available parking spaces: {}".format(view_available_parking_spaces(parking_records)))
+# status_label.pack(padx=5, pady=5)
+# status_label.pack(padx=5, pady=5)
+
+# # Create the label to display the query status
+# query_status_label = tk.Label(root, text="")
+# query_status_label.pack(padx=5, pady=5)
+
+
+# # Start the main loop
+# root.mainloop()
 
 
 

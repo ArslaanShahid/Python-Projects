@@ -89,24 +89,24 @@ def query_parking_record(parking_records):
             return
     status_label.config(text="Ticket number not found.")
 
-def find_record_by_reg_num(reg_num, parking_records):
+def find_record_by_reg_num(registration_number, parking_records):
     """
     Find a parking record in the list of parking records by registration number
     """
-    print(reg_num)
+    print(registration_number)
     for record in parking_records:
-        if record['reg_num'] == reg_num:
+        if record['registration_number'] == registration_number:
             return record
     return None
 
-def exit_car_park(reg_num, parking_records, parking_spaces):
-    reg_num = reg_num_entry.get()
-    record = find_record_by_reg_num(reg_num, parking_records)
+def exit_car_park(registration_number, parking_records, parking_spaces):
+    registration_number = reg_num_entry.get()
+    record = find_record_by_reg_num(registration_number, parking_records)
     if record is None:
-        print(f"No record found for vehicle with registration number {reg_num}")
+        print(f"No record found for vehicle with registration number {registration_number}")
         return
     if record['exit_time'] != '':
-        print(f"Vehicle with registration number {reg_num} has already exited the car park")
+        print(f"Vehicle with registration number {registration_number} has already exited the car park")
         return
     entry_time = datetime.strptime(record['entry_time'], '%m/%d/%Y %I:%M:%S %p')
     exit_time = datetime.now()
@@ -114,7 +114,7 @@ def exit_car_park(reg_num, parking_records, parking_spaces):
     hours_parked = duration.total_seconds() / 3600
     parking_fee = round(2 * hours_parked, 2)
     record['exit_time'] = exit_time
-    print(f"Vehicle with registration number {reg_num} has parked for {hours_parked:.2f} hours and needs to pay £{parking_fee:.2f}")
+    print(f"Vehicle with registration number {registration_number} has parked for {hours_parked:.2f} hours and needs to pay £{parking_fee:.2f}")
     parking_space_id = record['parking_space_id']
     parking_spaces[parking_space_id] = True
     print(f"The parking space {parking_space_id} has been freed up")
@@ -127,7 +127,6 @@ def save_parking_records_to_csv(filename,parking_records):
         for record in parking_records:
             writer.writerow(record.values())
 
-
 def on_closing():
     # Save the parking records to the CSV file
     save_parking_records_to_csv('parking_records.csv', parking_records)
@@ -135,7 +134,7 @@ def on_closing():
 
 
 root = tk.Tk()
-root.title("Car Park Entry and Find Car by Registration Number")
+root.title("Car Parking")
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Create a frame for the entry form
@@ -151,7 +150,7 @@ reg_num_entry.pack(side=tk.LEFT)
 enter_button = tk.Button(form_frame, text="Enter Car Park", command=lambda: enter_car_park(parking_records, parking_spaces))
 enter_button.pack(side=tk.LEFT, padx=5)
 # Exit Button
-exit_button = tk.Button(root, text="Exit Car Park", command=lambda: exit_car_park(find_record_by_reg_num(reg_num_entry.get(), parking_records), parking_spaces))
+exit_button = tk.Button(root, text="Exit Car Park", command=lambda: exit_car_park(reg_num_entry.get(), parking_records, parking_spaces))
 exit_button.pack(padx=5, pady=5)
 
 

@@ -1,9 +1,10 @@
 import csv
-import datetime
 import tkinter as tk
+from datetime import datetime
 from tkinter import messagebox
 
-parking_spaces = {}
+parking_spaces = ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"]
+
 
 
 def read_parking_records_csv(file_path):
@@ -45,33 +46,35 @@ def enter_car_park(parking_records, parking_spaces):
         reg_num = reg_num_entry.get()
         
         # Get the current date and time
-        now = datetime.datetime.now()
+        now = datetime.now()
         formatted_time = now.strftime('%m/%d/%Y %I:%M:%S %p')
         
         # Assign the first available parking space and ticket number
-        space_num = parking_spaces.pop(0)
-        ticket_num = len(parking_records) + 1
+        parking_space_id = parking_spaces.pop(0)
+        ticket_number = len(parking_records) + 1
         
         # Create a new parking record with the registration number, entry time, space number, and ticket number
-        record = {"registration_number": reg_num, "entry_time": formatted_time, "space_number": space_num, "ticket_number": ticket_num}
+        record = {'ticket_number': ticket_number,
+                'registration_number': reg_num,
+                'entry_time': formatted_time,
+                'exit_time': None,
+                'parking_space_id': parking_space_id }
         
         # Add the parking record to the list
         parking_records.append(record)
         
         # Update the status label with the remaining available parking spaces and space number assigned to the vehicle
-        status_label.config(text="Number of available parking spaces: {}\nSpace number assigned to the vehicle: {}".format(len(parking_spaces), space_num))
+        status_label.config(text="Number of available parking spaces: {}\nSpace number assigned to the vehicle: {}".format(len(parking_spaces), parking_space_id))
         
         # Clear the entry field
         reg_num_entry.delete(0, tk.END)
         reg_num_entry.focus()
 
-def view_available_parking_spaces(parking_records):
-    """Counts the number of available parking spaces based on the current parking records.
+def view_available_parking_spaces(parking_spaces):
+    """Counts the number of available parking spaces based on the current parking_spaces list.
     Returns an integer representing the number of available parking spaces."""
-    total_parking_spaces = 9  # Total number of parking spaces
-    used_parking_spaces = len(parking_records)  # Counting the number of records in the parking_records list
-    available_parking_spaces = total_parking_spaces - used_parking_spaces
-    return available_parking_spaces
+    return sum(1 for space in parking_spaces if space)
+
 
 def query_parking_record(parking_records):
     pr = parking_records
@@ -99,8 +102,8 @@ def find_record_by_reg_num(registration_number, parking_records):
             return record
     return None
 
+
 def exit_car_park(registration_number, parking_records, parking_spaces):
-    registration_number = reg_num_entry.get()
     record = find_record_by_reg_num(registration_number, parking_records)
     if record is None:
         print(f"No record found for vehicle with registration number {registration_number}")
@@ -116,9 +119,10 @@ def exit_car_park(registration_number, parking_records, parking_spaces):
     record['exit_time'] = exit_time
     print(f"Vehicle with registration number {registration_number} has parked for {hours_parked:.2f} hours and needs to pay £{parking_fee:.2f}")
     parking_space_id = record['parking_space_id']
-    parking_spaces[parking_space_id] = True
+    parking_space_index = parking_spaces.index(parking_space_id)
+    parking_spaces[parking_space_index] = parking_space_id
     print(f"The parking space {parking_space_id} has been freed up")
-    print(f"There are {view_available_parking_spaces(parking_spaces)} parking spaces available")
+    print(f"There are {len(parking_spaces)} parking spaces available")
 
 def save_parking_records_to_csv(filename,parking_records):
     with open(filename, 'w', newline='') as csvfile:
@@ -166,7 +170,7 @@ query_button.pack(padx=5, pady=5)
 
 # Initialize parking records and spaces
 parking_records = read_parking_records_csv('parking_records.csv')
-parking_spaces = list(range(1, 11))
+# parking_spaces = list(range(1, 11))
 
 # Add status label
 status_label = tk.Label(root, text="Number of available parking spaces: {}".format(view_available_parking_spaces(parking_records)))

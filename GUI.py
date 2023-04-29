@@ -180,3 +180,4 @@ query_status_label.pack(padx=5, pady=5)
 # Start the main loop
 root.mainloop()
 
+

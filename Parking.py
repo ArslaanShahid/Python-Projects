@@ -54,8 +54,10 @@ def enter_car_park(parking_records, parking_spaces):
     print("Number of available parking spaces:", len(parking_spaces))   
 
 def find_record_by_reg_num(reg_num, parking_records):
+    # convert reg_num to integer
     for record in parking_records:
         if record['registration_number'] == reg_num:
+            print(record)
             return record
     print(f"No record found for vehicle with registration number {reg_num}")
     return None
@@ -112,30 +114,31 @@ def save_parking_records_to_csv(parking_records, filename):
             
 parking_records = read_parking_records_csv('parking_records.csv')
 
-while True:
-    print("\nCar Park Menu")
-    print("1. Enter the car park")
-    print("2. Exit the car park")
-    print("3. View available parking spaces")
-    print("4. Query parking record by ticket number")
-    print("5. Quit")
+# while True:
+#     print("\nCar Park Menu")
+#     print("1. Enter the car park")
+#     print("2. Exit the car park")
+#     print("3. View available parking spaces")
+#     print("4. Query parking record by ticket number")
+#     print("5. Quit")
 
-    choice = input("Enter your choice (1-5): ")
+#     choice = input("Enter your choice (1-5): ")
 
-    if choice == "1":
-        enter_car_park(parking_records, parking_spaces)
-    elif choice == "2":
-        exit_car_park(parking_records, parking_spaces)
-    elif choice == "3":
-        view_available_parking_spaces(parking_spaces)
-    elif choice == "4":
-        query_parking_record_by_ticket_number(parking_records)
-    elif choice == "5":
-        save_parking_records_to_csv(parking_records,'parking_records.csv')
-        break
-    else:
-        print("Invalid choice. Please try again.")
+#     if choice == "1":
+#         enter_car_park(parking_records, parking_spaces)
+#     elif choice == "2":
+#         exit_car_park(parking_records, parking_spaces)
+#     elif choice == "3":
+#         view_available_parking_spaces(parking_spaces)
+#     elif choice == "4":
+#         query_parking_record_by_ticket_number(parking_records)
+#     elif choice == "5":
+#         save_parking_records_to_csv(parking_records,'parking_records.csv')
+#         break
+#     else:
+#         print("Invalid choice. Please try again.")
         
+
 
 # test = view_available_parking_spaces(parking_spaces)
 # print(test)
@@ -146,9 +149,9 @@ while True:
 #         reader = csv.reader(file)
 #         for row in reader:
 #             print(row)
-# data = read_parking_records_csv('parking_records.csv')
-# reg = 'ABC-123'
-# record = find_record_by_reg_num(reg, data)
+data = read_parking_records_csv('parking_records.csv')
+reg = 'GAM-5982'
+record = find_record_by_reg_num(reg, data)
 
 # exit_car_park(data, parking_spaces)
 # print(exit_car_park)

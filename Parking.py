@@ -68,7 +68,6 @@ def view_available_parking_spaces(parking_records):
     available_parking_spaces = total_parking_spaces - used_parking_spaces
     return available_parking_spaces
 
-
 def exit_car_park(parking_records, parking_spaces):
     reg_num = input("Please enter the vehicle's registration number: ")
     print(reg_num)
@@ -91,7 +90,6 @@ def exit_car_park(parking_records, parking_spaces):
     parking_spaces[parking_space_id] = True
     print(f"The parking space {parking_space_id} has been freed up")
     print(f"There are {view_available_parking_spaces(parking_spaces)} parking spaces available")
-
 
 def query_parking_record_by_ticket_number(parking_records):
     ticket_number = input("Enter ticket number: ")

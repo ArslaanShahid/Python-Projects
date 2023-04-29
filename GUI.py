@@ -89,11 +89,54 @@ def query_parking_record(parking_records):
             return
     status_label.config(text="Ticket number not found.")
 
+def find_record_by_reg_num(reg_num, parking_records):
+    """
+    Find a parking record in the list of parking records by registration number
+    """
+    print(reg_num)
+    for record in parking_records:
+        if record['reg_num'] == reg_num:
+            return record
+    return None
 
+def exit_car_park(reg_num, parking_records, parking_spaces):
+    reg_num = reg_num_entry.get()
+    record = find_record_by_reg_num(reg_num, parking_records)
+    if record is None:
+        print(f"No record found for vehicle with registration number {reg_num}")
+        return
+    if record['exit_time'] != '':
+        print(f"Vehicle with registration number {reg_num} has already exited the car park")
+        return
+    entry_time = datetime.strptime(record['entry_time'], '%m/%d/%Y %I:%M:%S %p')
+    exit_time = datetime.now()
+    duration = exit_time - entry_time
+    hours_parked = duration.total_seconds() / 3600
+    parking_fee = round(2 * hours_parked, 2)
+    record['exit_time'] = exit_time
+    print(f"Vehicle with registration number {reg_num} has parked for {hours_parked:.2f} hours and needs to pay £{parking_fee:.2f}")
+    parking_space_id = record['parking_space_id']
+    parking_spaces[parking_space_id] = True
+    print(f"The parking space {parking_space_id} has been freed up")
+    print(f"There are {view_available_parking_spaces(parking_spaces)} parking spaces available")
+
+def save_parking_records_to_csv(filename,parking_records):
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Ticket Number','Registration Number', 'Entry Time', 'Exit Time', 'Parking Space ID'])
+        for record in parking_records:
+            writer.writerow(record.values())
+
+
+def on_closing():
+    # Save the parking records to the CSV file
+    save_parking_records_to_csv('parking_records.csv', parking_records)
+    root.destroy()
 
 
 root = tk.Tk()
 root.title("Car Park Entry and Find Car by Registration Number")
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Create a frame for the entry form
 form_frame = tk.Frame(root)
@@ -107,6 +150,10 @@ reg_num_entry.pack(side=tk.LEFT)
 # Add submit button for entry
 enter_button = tk.Button(form_frame, text="Enter Car Park", command=lambda: enter_car_park(parking_records, parking_spaces))
 enter_button.pack(side=tk.LEFT, padx=5)
+# Exit Button
+exit_button = tk.Button(root, text="Exit Car Park", command=lambda: exit_car_park(find_record_by_reg_num(reg_num_entry.get(), parking_records), parking_spaces))
+exit_button.pack(padx=5, pady=5)
+
 
 # Add form labels and entry fields for finding a parked car
 ticket_num_label = tk.Label(root, text="Enter Ticket Number:")
@@ -133,136 +180,3 @@ query_status_label.pack(padx=5, pady=5)
 # Start the main loop
 root.mainloop()
 
-
-# root = tk.Tk()
-# root.title("Car Park Entry and Find Car by Registration Number")
-
-# # Create a frame for the entry form
-# form_frame = tk.Frame(root)
-# form_frame.pack(padx=10, pady=10)
-
-# # Add form labels and entry fields
-# tk.Label(form_frame, text="Registration Number:").pack(side=tk.LEFT)
-# reg_num_entry = tk.Entry(form_frame)
-# reg_num_entry.pack(side=tk.LEFT)
-# ticket_num_label = tk.Label(root, text="Enter Ticket Number:")
-# ticket_num_label.pack(padx=5, pady=5)
-# ticket_num_entry = tk.Entry(root)
-# ticket_num_entry.pack(padx=5, pady=5)
-# #add_car
-
-# enter_button = tk.Button(form_frame, text="Enter Car Park", command=enter_car_park)
-# enter_button.pack(side=tk.LEFT, pady=10)
-
-# # Add submit buttons for entry and find
-# tk.Button(form_frame, text="Enter Car Park", command=enter_car_park).pack(side=tk.LEFT, pady=10)
-# query_button = tk.Button(root, text="Query", command=lambda: query_parking_record(parking_records))
-# query_button.pack(padx=5, pady=5)
-
-
-# # Initialize parking records and spaces
-# parking_records = read_parking_records_csv('parking_records.csv')
-# parking_spaces = list(range(1, 11))
-# # Add status label
-# status_label = tk.Label(root, text="Number of available parking spaces: {}".format(view_available_parking_spaces(parking_records)))
-# status_label.pack(padx=5, pady=5)
-# status_label.pack(padx=5, pady=5)
-
-# # Create the label to display the query status
-# query_status_label = tk.Label(root, text="")
-# query_status_label.pack(padx=5, pady=5)
-
-
-# # Start the main loop
-# root.mainloop()
-
-
-
-
-# def exit_car_park(parking_records, parking_spaces):
-#     reg_num = input("Please enter the vehicle's registration number: ")
-#     print(reg_num)
-#     record = find_record_by_reg_num(reg_num, parking_records)
-#     print(record)
-#     if record is None:
-#         print(f"No record found for vehicle with registration number {reg_num}")
-#         return
-#     if record['exit_time'] != '':
-#         print(f"Vehicle with registration number {reg_num} has already exited the car park")
-#         return
-#     entry_time = datetime.strptime(record['entry_time'], '%m/%d/%Y %I:%M:%S %p')
-#     exit_time = datetime.now()
-#     duration = exit_time - entry_time
-#     hours_parked = duration.total_seconds() / 3600
-#     parking_fee = round(2 * hours_parked, 2)
-#     record['exit_time'] = exit_time
-#     print(f"Vehicle with registration number {reg_num} has parked for {hours_parked:.2f} hours and needs to pay £{parking_fee:.2f}")
-#     parking_space_id = record['parking_space_id']
-#     parking_spaces[parking_space_id] = True
-#     print(f"The parking space {parking_space_id} has been freed up")
-#     print(f"There are {view_available_parking_spaces(parking_spaces)} parking spaces available")
-
-# def query_parking_record_by_ticket_number(parking_records):
-#     ticket_number = input("Enter ticket number: ")
-#     for record in parking_records:
-#         if record["ticket_number"] == ticket_number:
-#             print(f"Ticket Number: {record['ticket_number']}")
-#             print(f"Registration Number: {record['registration_number']}")
-#             print(f"Parking Space ID: {record['parking_space_id']}")
-#             print(f"Entry Time: {record['entry_time']}")
-#             print(f"Exit Time: {record['exit_time'] if record['exit_time'] else 'Not Exited Yet'}")
-#             return
-#     print("Ticket number not found.")
-
-# [def save_parking_records_to_csv(parking_records, filename):
-#     with open(filename, 'w', newline='') as csvfile:
-#         writer = csv.writer(csvfile)
-#         writer.writerow(['Ticket Number','Registration Number', 'Entry Time', 'Exit Time', 'Parking Space ID'])
-#         for record in parking_records:
-#             writer.writerow(record.values())]
-            
-
-# while True:
-#     print("\nCar Park Menu")
-#     print("1. Enter the car park")
-#     print("2. Exit the car park")
-#     print("3. View available parking spaces")
-#     print("4. Query parking record by ticket number")
-#     print("5. Quit")
-
-#     choice = input("Enter your choice (1-5): ")
-
-#     if choice == "1":
-#         enter_car_park(parking_records, parking_spaces)
-#     elif choice == "2":
-#         exit_car_park(parking_records, parking_spaces)
-#     elif choice == "3":
-#         view_available_parking_spaces(parking_spaces)
-#     elif choice == "4":
-#         query_parking_record_by_ticket_number(parking_records)
-#     elif choice == "5":
-#         save_parking_records_to_csv(parking_records,'parking_records.csv')
-#         break
-#     else:
-#         print("Invalid choice. Please try again.")
-        
-
-# test = view_available_parking_spaces(parking_spaces)
-# print(test)
-
-
-# def show_csv_data(file_path):
-#     with open(file_path, 'r') as file:
-#         reader = csv.reader(file)
-#         for row in reader:
-#             print(row)
-# data = read_parking_records_csv('parking_records.csv')
-# reg = 'ABC-123'
-# record = find_record_by_reg_num(reg, data)
-
-# exit_car_park(data, parking_spaces)
-# print(exit_car_park)
-# if record:
-#     print(record)
-# else:
-#     print('Record not found')

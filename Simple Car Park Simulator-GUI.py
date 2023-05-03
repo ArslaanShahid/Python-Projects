@@ -13,7 +13,7 @@ def read_parking_records_csv(file_path):
         # Create a CSV reader object
         reader = csv.reader(file)
         # Skip the header row
-        next(reader)
+        next(reader, None)
         # Loop over each row in the CSV file
         for row in reader:
             # Process the row
@@ -75,7 +75,6 @@ def view_available_parking_spaces(parking_spaces):
     Returns an integer representing the number of available parking spaces."""
     return sum(1 for space in parking_spaces if space)
 
-
 def query_parking_record(parking_records):
     pr = parking_records
     print(pr)   
@@ -101,7 +100,6 @@ def find_record_by_reg_num(registration_number, parking_records):
         if record['registration_number'] == registration_number:
             return record
     return None
-
 
 def exit_car_park(registration_number, parking_records, parking_spaces):
     record = find_record_by_reg_num(registration_number, parking_records)

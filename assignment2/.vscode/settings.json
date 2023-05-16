@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "test",
+            "database": "${workspaceFolder:assignment2}/CarDatabase.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

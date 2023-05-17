@@ -90,7 +90,7 @@ def ExecuteQuery(cursor, query):
     results = cursor.fetchall()
     return results
 
-def update_humidity_category(cursor):
+def Add_humidity_category_column(cursor):
     #Create Humidity Column
     cursor.execute('ALTER TABLE CarSharing ADD COLUMN humidity_category TEXT')
 

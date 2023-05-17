@@ -264,7 +264,7 @@ def create_weather_table(cursor):
     conn.commit()
 
 #Function Call
-database_file = 'CarDatabase_dataAnalytics.db'
+database_file = 'CarDatabase.db'
 create_database(database_file)
 
 conn = sqlite3.connect(database_file)
@@ -276,15 +276,17 @@ cursor = conn.cursor()
 # create_weather_table(cursor)
 
 
-#The date and time (timestamp) when we had the lowest temperature and the corresponding demand rate.
-a = '''
+#A) The date and time (timestamp) when we had the lowest temperature and the corresponding demand rate.
+Query_A = '''
     SELECT Time.timestamp, CarSharing.demand
     FROM Time
     JOIN CarSharing ON Time.id = CarSharing.id
     JOIN Weather ON Weather.id = CarSharing.id
     WHERE Weather.temp = (SELECT MIN(temp) FROM Weather)
 '''
-b = '''
+
+#B) The average, highest, and lowest windspeed and humidity for working days (i. e., workingday=“Yes”) and non-working days ((i. e., workingday=“No”) in 2017 andthe corresponding windspeed and humidity values.
+Query_B = '''
     SELECT h.workingday,
            AVG(w.windspeed) AS average_windspeed,
            MAX(w.windspeed) AS highest_windspeed,
@@ -299,8 +301,8 @@ b = '''
         AND t.timestamp LIKE '2017-%'
     GROUP BY h.workingday
 '''
-
-query_b = '''
+#C) The weekday, month, and season when we had the highest average demand ratesthroughout 2017 and the corresponding average demand rates. 
+Query_C = '''
 SELECT
     Time.weekday_name,
     Time.month,
@@ -329,8 +331,8 @@ HAVING
                 Time.weekday_name, Time.month, Time.season_name)
         )
 '''
-
-query_c = '''
+#D) The average demand rates for each Dry, Sticky, and Oppressive humidity in 2017 sorted in descending order based on their average demand rates.
+Query_D = '''
 SELECT Weather.humidity_category, AVG(CarSharing.demand) AS average_demand
 FROM CarSharing
 JOIN Time ON CarSharing.id = Time.id
@@ -341,7 +343,7 @@ ORDER BY average_demand DESC
 '''
 
 
-results = ExecuteQuery(cursor, query_c)
+results = ExecuteQuery(cursor, Query_D)
 for row in results:
         print(row)
 conn.commit()

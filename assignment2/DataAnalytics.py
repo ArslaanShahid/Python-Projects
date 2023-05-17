@@ -1,4 +1,5 @@
 import sqlite3
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA

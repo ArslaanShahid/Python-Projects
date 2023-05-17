@@ -277,14 +277,14 @@ cursor = conn.cursor()
 
 
 #The date and time (timestamp) when we had the lowest temperature and the corresponding demand rate.
-weather_query = '''
+a = '''
     SELECT Time.timestamp, CarSharing.demand
     FROM Time
     JOIN CarSharing ON Time.id = CarSharing.id
     JOIN Weather ON Weather.id = CarSharing.id
     WHERE Weather.temp = (SELECT MIN(temp) FROM Weather)
 '''
-query = '''
+b = '''
     SELECT h.workingday,
            AVG(w.windspeed) AS average_windspeed,
            MAX(w.windspeed) AS highest_windspeed,

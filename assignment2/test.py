@@ -76,6 +76,9 @@ def Add_humidity_category_column(cursor):
 
 #### Task 3
 #3(a)
+def create_weather_table(cursor):
+#3(b)
+
 def assign_code_to_values(cursor):
     # Get distinct values of workingday and holiday columns
     cursor.execute('SELECT DISTINCT workingday FROM CarSharing')
@@ -112,6 +115,7 @@ def assign_code_to_values(cursor):
     # Commit the changes
     conn.commit()
 
+#3(c)
 def create_holiday_table(cursor):
     # Create the "Holiday" table if it doesn't exist
     cursor.execute('''
@@ -145,6 +149,7 @@ def create_holiday_table(cursor):
     # Commit the changes
     conn.commit()
 
+#3(d)
 def create_time_table(cursor):
     # Create the "Time" table
     cursor.execute('''
@@ -189,7 +194,6 @@ def create_time_table(cursor):
     # Commit the changes
     conn.commit()
 
-def create_weather_table(cursor):
     # Create the "Weather" table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Weather (

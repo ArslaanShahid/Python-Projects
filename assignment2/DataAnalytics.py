@@ -1,7 +1,8 @@
 import sqlite3
 
+import matplotlib.pyplot as plt
 import pandas as pd
-import scipy.stats as stats
+from statsmodels.tsa.arima.model import ARIMA
 
 database_file = 'CarDatabase_dataAnalytics.db'
 
@@ -10,36 +11,51 @@ conn = sqlite3.connect(database_file)
 # Load CarSharing table into a Pandas DataFrame
 df = pd.read_sql_query("SELECT * FROM CarSharing", conn)
 
-print(df)
+# print(df)
 # Drop duplicate rows
 print("Drop Dublicating.....")
 check_drop = df.drop_duplicates(inplace=True)
 print(check_drop)
+# Prepare the data
+print(df.columns)
+
+df_2017 = df[df['timestamp'].dt.year == 2017][['timestamp', 'temp']]
+
+# Set the 'timestamp' column as the index
+df_2017.set_index('timestamp', inplace=True)
+print(df_2017)
+# Resample the data on a weekly basis and calculate the mean temperature
+df_weekly = df_2017.resample('W').mean()
+
+# Extract the temperature column from the weekly data
+weekly_temp = df_weekly['temp']
+# train_data = df_weekly.iloc[:int(len(df_weekly) * 0.7)]
+# test_data = df_weekly.iloc[int(len(df_weekly) * 0.7):]
+
+# print(train_data['temp']) 
 
 
-# # Handle missing values
-# df.dropna(inplace=True)
+# # Build the ARIMA model
+# model = ARIMA(train_data['temp_feel'], order=(1, 0, 0))
+# print(model)
 
-# # Convert data types if necessary
-# df['temp'] = df['temp'].astype(float)
-# df['humidity'] = df['humidity'].astype(float)
-# df['windspeed'] = df['windspeed'].astype(float)
+# model_fit = model.fit()
 
-# # Perform statistical tests
-# columns = ['temp', 'humidity', 'windspeed', 'workingday']
-# results = {}
+# # Validate the model
+# predictions = model_fit.predict(start=test_data.index[0], end=test_data.index[-1])
 
-# for column in columns:
-#     # Perform the statistical test
-#     test_statistic, p_value = stats.pearsonr(df[column], df['demand'])
-#     results[column] = (test_statistic, p_value)
+# # Plot the actual and predicted values
+# plt.plot(test_data.index, test_data['temp'], label='Actual')
+# plt.plot(predictions.index, predictions, label='Predicted')
+# plt.xlabel('Date')
+# plt.ylabel('Temperature')
+# plt.title('ARIMA Model - Weekly Average Temperature')
+# plt.legend()
+# plt.show()
 
-# # Print the results
-# for column, (test_statistic, p_value) in results.items():
-#     print(f"Test for {column}:")
-#     print(f"Test statistic: {test_statistic}")
-#     print(f"P-value: {p_value}")
-#     print("")
+# # Make predictions
+# forecast = model_fit.forecast(steps=52)  # Adjust the steps as per your desired time period
 
-# # Close the connection
-# conn.close()
+# # Print the forecasted temperatures
+# print("Forecasted temperatures:")
+# print(forecast)
